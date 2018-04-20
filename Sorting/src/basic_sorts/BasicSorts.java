@@ -6,7 +6,18 @@ public class BasicSorts
 {
     public static void main(String[] args)
     {
+        int[] numbers = {42, 24, 41, 8, 11, 23, 8, 142, 420, 1237, 0};
+        numbers = generateRandomArray(500000, 1, 500000);
+        insertionSort(numbers);
 
+        for (int number: numbers)
+        {
+            System.out.println(number);
+        }
+        System.out.println();
+
+        //is it sorted?
+        System.out.println("Sorted? " + !detectAdjacentInversions(numbers));
     }
 
     public static void bubbleSort(int[] array)
@@ -112,7 +123,7 @@ public class BasicSorts
         array[second] = temp;
     }
 
-    private static boolean detectInversions(int[] array)
+    private static boolean detectAdjacentInversions(int[] array)
     {
         for (int i = 0; i < array.length - 1; i++)
         {
