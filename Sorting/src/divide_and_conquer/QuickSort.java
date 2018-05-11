@@ -1,4 +1,4 @@
-package scratch;
+package divide_and_conquer;
 
 import java.util.Random;
 
