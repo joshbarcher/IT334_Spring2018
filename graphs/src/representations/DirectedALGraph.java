@@ -1,5 +1,7 @@
 package representations;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class DirectedALGraph<T>
@@ -8,6 +10,9 @@ public class DirectedALGraph<T>
     private Node<T>[] adjacencyList;
     private int vertexSize;
     private int edgeSize;
+
+    //Pair(in-degree, out-degree)
+    private Map<T, Pair<Integer, Integer>> degrees = new HashMap<>();
 
     public DirectedALGraph()
     {
@@ -35,6 +40,24 @@ public class DirectedALGraph<T>
         }
     }
 
+    public void addVertices(T... vertices)
+    {
+        for (T vertex : vertices)
+        {
+            addVertex(vertex);
+        }
+    }
+
+    public void addEdges(Pair<T, T>... edges)
+    {
+        for (Pair<T, T> edge : edges)
+        {
+            addEdge(edge.getFirst(), edge.getSecond());
+        }
+    }
+
+    //returns the position of the vertex where it should be (it may
+    //not be present)
     private int getPosition(T vertex)
     {
         int hash = vertex.hashCode();
@@ -70,13 +93,38 @@ public class DirectedALGraph<T>
         //edge not present
         if (current.next == null)
         {
+            //adding the edge!
             current.next = new Node<>(to, null);
+            incrementDegrees(from, to);
             edgeSize++;
             return true;
         }
         else
         {
             return false;
+        }
+    }
+
+    private void incrementDegrees(T from, T to)
+    {
+        //make sure that from exists in the map
+        ensureDegreeExists(from);
+        ensureDegreeExists(to);
+
+        //update the in-degree of to
+        Pair<Integer, Integer> toDegree = degrees.get(to);
+        toDegree.setFirst(toDegree.getFirst() + 1);
+
+        //update the out-degree of from
+        Pair<Integer, Integer> fromDegree = degrees.get(from);
+        fromDegree.setSecond(fromDegree.getSecond() + 1);
+    }
+
+    private void ensureDegreeExists(T vertex)
+    {
+        if (!degrees.containsKey(vertex))
+        {
+            degrees.put(vertex, new Pair<>(0, 0));
         }
     }
 
@@ -112,6 +160,86 @@ public class DirectedALGraph<T>
     public int edgeSize()
     {
         return edgeSize;
+    }
+
+    public boolean hasVertex(T vertex)
+    {
+        return adjacencyList[getPosition(vertex)] != null;
+    }
+
+    public boolean hasEdge(T from, T to)
+    {
+        int position = getPosition(from);
+        Node<T> current = adjacencyList[position];
+
+        //make sure the from vertex is in the graph
+        if (current == null)
+        {
+            return false;
+        }
+        else
+        {
+            return findEdgeTo(current, to).next != null;
+        }
+    }
+
+    public int inDegree(T vertex)
+    {
+        if (!hasVertex(vertex))
+        {
+            return -1;
+        }
+
+        return degrees.containsKey(vertex) ? degrees.get(vertex).getFirst() : 0;
+    }
+
+    public int outDegree(T vertex)
+    {
+        if (!hasVertex(vertex))
+        {
+            return -1;
+        }
+
+        return degrees.containsKey(vertex) ? degrees.get(vertex).getSecond() : 0;
+    }
+
+    public String toString()
+    {
+        StringBuilder vertexBuilder = new StringBuilder();
+        StringBuilder edgeBuilder = new StringBuilder();
+
+        //vertex set and edge set
+        vertexBuilder.append("V = {");
+        edgeBuilder.append("E = {");
+        int vertexCount = 0;
+        int edgeCount = 0;
+        for (int i = 0; i < adjacencyList.length; i++)
+        {
+            Node<T> current = adjacencyList[i];
+            if (current != null)
+            {
+                Object from = current.data;
+                vertexCount++;
+                vertexBuilder.append(vertexCount != 1 ? ", " : "");
+                vertexBuilder.append(from);
+
+                //mark all edges
+                while (current.next != null)
+                {
+                    Object to = current.next.data;
+                    edgeCount++;
+                    edgeBuilder.append(edgeCount != 1 ? ", " : "");
+                    edgeBuilder.append("(" + from + ", " + to + ")");
+
+                    //move to next node
+                    current = current.next;
+                }
+            }
+        }
+        vertexBuilder.append("}");
+        edgeBuilder.append("}");
+
+        return vertexBuilder.toString() + "\n" + edgeBuilder.toString();
     }
 
     private class Node<T>
