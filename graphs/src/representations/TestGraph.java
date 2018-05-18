@@ -1,5 +1,7 @@
 package representations;
 
+import java.util.List;
+
 public class TestGraph
 {
     public static void main(String[] args)
@@ -36,5 +38,13 @@ public class TestGraph
         System.out.println(letterGraph.inDegree("a"));
         System.out.println(letterGraph.inDegree("u"));
         System.out.println(letterGraph.inDegree("aaa"));
+        System.out.println();
+
+        //test the dfs traversal
+        List<String> dfs = letterGraph.dfs("a");
+        for (String vertex : dfs)
+        {
+            System.out.println(vertex);
+        }
     }
 }

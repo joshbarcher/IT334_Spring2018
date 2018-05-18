@@ -1,8 +1,6 @@
 package representations;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class DirectedALGraph<T>
 {
@@ -201,6 +199,40 @@ public class DirectedALGraph<T>
         }
 
         return degrees.containsKey(vertex) ? degrees.get(vertex).getSecond() : 0;
+    }
+
+    public List<T> dfs(T start)
+    {
+        Set<T> seen = new HashSet<>();
+        List<T> traversal = new ArrayList<>();
+
+        //find the first vertex
+        if (adjacencyList[getPosition(start)] != null)
+        {
+            //perform the dfs search
+            dfs(start, seen, traversal);
+        }
+
+        return traversal;
+    }
+
+    private void dfs(T current, Set<T> seen, List<T> traversal)
+    {
+        //don't continue if we visited this node
+        if (!seen.contains(current))
+        {
+            seen.add(current);
+            traversal.add(current);
+
+            //look at incident edges
+            Node<T> currentNode = adjacencyList[getPosition(current)];
+            while (currentNode.next != null)
+            {
+                //there is an edge here, search in this direction
+                dfs(currentNode.next.data, seen, traversal);
+                currentNode = currentNode.next;
+            }
+        }
     }
 
     public String toString()
