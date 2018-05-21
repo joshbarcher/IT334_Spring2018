@@ -235,6 +235,41 @@ public class DirectedALGraph<T>
         }
     }
 
+    //returns a map of vertices to distance values, all of which represent
+    //the shortest path from source to the vertex
+    public Map<T, Integer> dijkstras(T source)
+    {
+        if (!hasVertex(source))
+        {
+            throw new IllegalArgumentException("Bad source given");
+        }
+
+        PriorityQueue<Pair<T, Integer>> priorityQueue = new PriorityQueue<>(
+                vertexSize, new VertexComparator());
+
+        //add all vertices to the queue
+        for (int i = 0; i < adjacencyList.length; i++)
+        {
+            if (adjacencyList[i] != null)
+            {
+                T vertex = adjacencyList[i].data;
+
+                if (vertex.equals(source))
+                {
+                    priorityQueue.add(new Pair<>(vertex, 0));
+                }
+                else
+                {
+                    priorityQueue.add(new Pair<>(vertex, -1));
+                }
+            }
+        }
+
+        //to be continued...
+        System.out.println(priorityQueue.poll());
+        return null;
+    }
+
     public String toString()
     {
         StringBuilder vertexBuilder = new StringBuilder();
@@ -283,6 +318,30 @@ public class DirectedALGraph<T>
         {
             this.data = data;
             this.next = next;
+        }
+    }
+
+    private class VertexComparator implements Comparator<Pair<T, Integer>>
+    {
+        @Override
+        public int compare(Pair<T, Integer> firstPair, Pair<T, Integer> secondPair)
+        {
+            //sort based on "infinity"
+            if (firstPair.getSecond() == -1 && secondPair.getSecond() == -1)
+            {
+                return 0;
+            }
+            else if (firstPair.getSecond() == -1) //first is infinity only
+            {
+                return 1;
+            }
+            else if (secondPair.getSecond() == -1) //second is infinity only
+            {
+                return -1;
+            }
+
+            //otherwise both elements are not infinity
+            return firstPair.getSecond() - secondPair.getSecond();
         }
     }
 }

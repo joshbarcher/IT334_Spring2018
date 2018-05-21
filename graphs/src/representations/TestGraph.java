@@ -46,5 +46,7 @@ public class TestGraph
         {
             System.out.println(vertex);
         }
+
+        letterGraph.dijkstras("a");
     }
 }
