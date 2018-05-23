@@ -71,9 +71,24 @@ public class DirectedALGraph<T>
         return index;
     }
 
+    public boolean addUndirectedEdge(T first, T second)
+    {
+        return addUndirectedEdge(first, second, 0);
+    }
+
+    public boolean addUndirectedEdge(T first, T second, int weight)
+    {
+        return addEdge(first, second, weight) && addEdge(second, first, weight);
+    }
+
+    public boolean addEdge(T from, T to)
+    {
+        return addEdge(from, to, 0);
+    }
+
     //add a directed edge (from, to) to the graph, returning true if the edge is
     //not already present
-    public boolean addEdge(T from, T to)
+    public boolean addEdge(T from, T to, int weight)
     {
         //do both vertices exist
         int fromPos = getPosition(from);
@@ -92,7 +107,7 @@ public class DirectedALGraph<T>
         if (current.next == null)
         {
             //adding the edge!
-            current.next = new Node<>(to, null);
+            current.next = new Node<>(to, null, weight);
             incrementDegrees(from, to);
             edgeSize++;
             return true;
@@ -244,6 +259,9 @@ public class DirectedALGraph<T>
             throw new IllegalArgumentException("Bad source given");
         }
 
+        //structures we need to solve the problem
+        Map<T, Integer> results = new HashMap<>();
+        Map<T, Integer> distances = new HashMap<>();
         PriorityQueue<Pair<T, Integer>> priorityQueue = new PriorityQueue<>(
                 vertexSize, new VertexComparator());
 
@@ -257,17 +275,52 @@ public class DirectedALGraph<T>
                 if (vertex.equals(source))
                 {
                     priorityQueue.add(new Pair<>(vertex, 0));
+                    distances.put(vertex, 0);
                 }
                 else
                 {
                     priorityQueue.add(new Pair<>(vertex, -1));
+                    distances.put(vertex, -1);
                 }
             }
         }
 
-        //to be continued...
-        System.out.println(priorityQueue.poll());
-        return null;
+        //loop while we have vertices that haven't been visited
+        while (!priorityQueue.isEmpty())
+        {
+            //get a vertex and record it
+            Pair<T, Integer> pair = priorityQueue.poll();
+            T vertex = pair.getFirst();
+            int shortestPath = pair.getSecond();
+            results.put(vertex, shortestPath);
+
+            //look at adjacent vertices and update the heap
+            Node<T> current = adjacencyList[getPosition(pair.getFirst())];
+            while (current.next != null)
+            {
+                T nextVertex = current.next.data;
+
+                //make sure we haven't finalized the shortest path to this vertex
+                if (!results.containsKey(nextVertex))
+                {
+                    //update the value if necessary
+                    int candidateShortestPath = shortestPath + current.next.fromWeight;
+                    if (distances.get(nextVertex) == -1 ||
+                            candidateShortestPath < distances.get(nextVertex))
+                    {
+                        //remove the nextVertex from the heap and reinsert
+                        //with a new distance value
+                        priorityQueue.remove(new Pair<>(nextVertex, null));
+                        priorityQueue.add(new Pair<>(nextVertex, candidateShortestPath));
+                        distances.put(nextVertex, candidateShortestPath);
+                    }
+                }
+
+                current = current.next;
+            }
+        }
+
+        return results;
     }
 
     public String toString()
@@ -313,11 +366,19 @@ public class DirectedALGraph<T>
     {
         private T data;
         private Node<T> next;
+        private int fromWeight;
 
         public Node(T data, Node<T> next)
         {
             this.data = data;
             this.next = next;
+        }
+
+        public Node(T data, Node<T> next, int weight)
+        {
+            this(data, next);
+
+            this.fromWeight = weight;
         }
     }
 

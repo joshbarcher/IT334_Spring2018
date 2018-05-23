@@ -1,10 +1,32 @@
 package representations;
 
 import java.util.List;
+import java.util.Map;
 
 public class TestGraph
 {
     public static void main(String[] args)
+    {
+        //create the graph
+        DirectedALGraph<String> letterGraph = new DirectedALGraph<>();
+
+        //add vertices
+        letterGraph.addVertices("a", "b", "c", "d");
+
+        //add edges
+        letterGraph.addUndirectedEdge("a", "b", 1);
+        letterGraph.addUndirectedEdge("b", "c", 1);
+        letterGraph.addUndirectedEdge("a", "c", 6);
+        letterGraph.addUndirectedEdge("c", "d", 3);
+
+        Map<String, Integer> shortestPaths = letterGraph.dijkstras("a");
+        for (String vertex : shortestPaths.keySet())
+        {
+            System.out.println(vertex + ": " + shortestPaths.get(vertex));
+        }
+    }
+
+    private static void testGraph()
     {
         //create the graph
         DirectedALGraph<String> letterGraph = new DirectedALGraph<>();
@@ -46,7 +68,5 @@ public class TestGraph
         {
             System.out.println(vertex);
         }
-
-        letterGraph.dijkstras("a");
     }
 }

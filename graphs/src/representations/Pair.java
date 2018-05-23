@@ -1,5 +1,7 @@
 package representations;
 
+import java.util.Objects;
+
 public class Pair<K, V>
 {
     private K first;
@@ -34,6 +36,21 @@ public class Pair<K, V>
     public void setSecond(V second)
     {
         this.second = second;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pair<?, ?> pair = (Pair<?, ?>) o;
+        return Objects.equals(first, pair.first);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(first);
     }
 
     @Override
