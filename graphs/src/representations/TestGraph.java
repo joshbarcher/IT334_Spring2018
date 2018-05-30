@@ -11,6 +11,38 @@ public class TestGraph
         DirectedALGraph<String> letterGraph = new DirectedALGraph<>();
 
         //add vertices
+        letterGraph.addVertices("a", "b", "c", "d", "e", "f", "g", "h");
+
+        //add edges
+        letterGraph.addUndirectedEdge("a", "b", 7);
+        letterGraph.addUndirectedEdge("a", "h", 8);
+        letterGraph.addUndirectedEdge("a", "g", 10);
+        letterGraph.addUndirectedEdge("a", "f", 3);
+        letterGraph.addUndirectedEdge("a", "e", 2);
+        letterGraph.addUndirectedEdge("f", "e", 4);
+        letterGraph.addUndirectedEdge("b", "c", 4);
+        letterGraph.addUndirectedEdge("e", "b", 1);
+        letterGraph.addUndirectedEdge("e", "c", 5);
+        letterGraph.addUndirectedEdge("e", "d", 6);
+        letterGraph.addUndirectedEdge("c", "d", 2);
+        letterGraph.addUndirectedEdge("b", "g", 9);
+        letterGraph.addUndirectedEdge("g", "d", 1);
+        letterGraph.addUndirectedEdge("g", "h", 7);
+        letterGraph.addUndirectedEdge("h", "d", 5);
+
+        Map<String, String> mst = letterGraph.prims("c");
+        for (String vertex : mst.keySet())
+        {
+            System.out.println(vertex + " --- " + mst.get(vertex));
+        }
+    }
+
+    private static void testShortestPath()
+    {
+        //create the graph
+        DirectedALGraph<String> letterGraph = new DirectedALGraph<>();
+
+        //add vertices
         letterGraph.addVertices("a", "b", "c", "d");
 
         //add edges

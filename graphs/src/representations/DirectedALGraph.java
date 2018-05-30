@@ -323,6 +323,62 @@ public class DirectedALGraph<T>
         return results;
     }
 
+    public Map<T, T> prims(T source)
+    {
+        //helper structures
+        Set<T> knownSet = new HashSet<>();
+        Queue<Edge> edgeHeap = new PriorityQueue<>(edgeSize, new EdgeComparator());
+        Map<T, T> results = new HashMap<>();
+
+        //add source vertex and incident edges
+        visitVertex(source, knownSet, edgeHeap);
+
+        //main loop
+        while (knownSet.size() < vertexSize)
+        {
+            Edge candidateEdge = edgeHeap.poll();
+
+            //the "to" vertex is not in the known set
+            if (!knownSet.contains(candidateEdge.to))
+            {
+                visitVertex(candidateEdge.to, knownSet, edgeHeap);
+
+                //map the child element in the mst to the parent element
+                results.put(candidateEdge.to, candidateEdge.from);
+            }
+            //the "from" vertex is not in the known set
+            else if (!knownSet.contains(candidateEdge.from))
+            {
+                visitVertex(candidateEdge.from, knownSet, edgeHeap);
+
+                //map the child element in the mst to the parent element
+                results.put(candidateEdge.from, candidateEdge.to);
+            }
+        }
+
+        return results;
+    }
+
+    private void visitVertex(T vertex, Set<T> knownSet, Queue<Edge> edgeHeap)
+    {
+        knownSet.add(vertex);
+        addIncidentEdges(vertex, edgeHeap);
+    }
+
+    private void addIncidentEdges(T vertex, Queue<Edge> edgeHeap)
+    {
+        Node<T> current = adjacencyList[getPosition(vertex)];
+        while (current.next != null)
+        {
+            //add the edge to the heap
+            Edge incidentEdge = new Edge(current.next.data, vertex, current.next.fromWeight);
+            edgeHeap.add(incidentEdge);
+
+            //move to the next edge
+            current = current.next;
+        }
+    }
+
     public String toString()
     {
         StringBuilder vertexBuilder = new StringBuilder();
@@ -379,6 +435,29 @@ public class DirectedALGraph<T>
             this(data, next);
 
             this.fromWeight = weight;
+        }
+    }
+
+    private class Edge
+    {
+        private T to;
+        private T from;
+        private int weight;
+
+        public Edge(T to, T from, int weight)
+        {
+            this.to = to;
+            this.from = from;
+            this.weight = weight;
+        }
+    }
+
+    private class EdgeComparator implements Comparator<Edge>
+    {
+        @Override
+        public int compare(Edge first, Edge second)
+        {
+            return first.weight - second.weight;
         }
     }
 
